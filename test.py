@@ -5,32 +5,40 @@ from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.keys import Keys
 
-driver=webdriver.Chrome()
-url = 'https://flight.yatra.com/air-search-ui/dom2/trigger?type=R&viewName=normal&flexi=0&noOfSegments=2&origin=DEL&originCountry=IN&destination=BOM&destinationCountry=IN&flight_depart_date=14%2F4%2F2023&arrivalDate=16%2F4%2F2023&ADT=1&CHD=0&INF=0&class=Economy&source=fresco-flights&unqvaldesktop=1598078401427'
+driver = webdriver.Chrome()
+url = "https://www.makemytrip.com/flight/search?itinerary={fro}-{to}-{deptDate}_{to}-{fro}-{arrivDate}&tripType={tripType}&paxType=A-1_C-0_I-0&intl=false&cabinClass=E&ccde=IN&lang=eng".format(fro="DEL",to="BOM",tripType="R",deptDate='04/04/2023',arrivDate='05/04/2023')
 driver.get(url);
-sleep(40)
+sleep(9)
+
+try:
+    driver.find_elements(By.XPATH, '//span[@class="bgProperties icon20 overlayCrossIcon"]').click()
+except:
+    print("");
 
 
-
-flight_rows=driver.find_elements(By.XPATH,'//div[@class="flight-det table full-width clearfix "]')
 list=[];
-for WebElement in flight_rows:
-    elementHTML=WebElement.get_attribute('outerHTML');
-    elementSoup=BeautifulSoup(elementHTML,'html.parser');
-    for rows in elementSoup:
-        sub_list=[]
+flightcards=driver.find_elements(By.XPATH, '//div[@class="listingCard "]')
+for card in flightcards:
+    elementHTML = card.get_attribute('outerHTML');
+    elementSoup = BeautifulSoup(elementHTML, 'html.parser');
+    sub_list=[];
 
-        sub_list.append(rows.find("div", {"autom": "departureTimeLabel"}).getText()[0:5])
-        sub_list.append(rows.find("p", {"autom": "arrivalTimeLabel"}).getText())
-        sub_list.append(rows.find("div", {"autom": "departureTimeLabel"}).getText()[5:])
-        sub_list.append(rows.find("p", {"autom": "durationLabel"}).getText())
-        if(type(rows.find("span", {"class": "dotted-borderbtm"}))!=type(None)):
-            sub_list.append(rows.find("span", {"class": "dotted-borderbtm"}).getText())
-        else:
-            sub_list.append('None')
-        sub_list.append(rows.find("div", {"class": "i-b tipsy fare-summary-tooltip fs-16"}).getText())
-        list.append(sub_list)
-for item in list:
-    print(item)
+
+    sub_list.append(elementSoup.find("span", {"class": "boldFont blackText"}).getText())
+    for time in elementSoup.findAll("p", {"class": "flightTimeInfo"}):
+        sub_list.append(time.getText())
+    for place in elementSoup.findAll("p", {"class": "blackText"}):
+        sub_list.append(place.getText())
+    sub_list.append(elementSoup.find("div", {"class": "stop-info"}).getText())
+    sub_list.append(elementSoup.find("div", {"class": "splitfare"}).getText())
+    print(sub_list)
+    list.append(sub_list)
+
+for data in list:
+    print(data)
+
+
+
+
 
 

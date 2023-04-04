@@ -71,7 +71,14 @@ def scrape(destination,destination1,depart,to):
 depart_date='04-04-2023'.replace("-",'%2F');
 to_date='05-04-2023'.replace("-","%2F");
 
-destinations=getAirports();
+while True:
+    try:
+        destinations=getAirports();
+        break;
+    except:
+        print("Again")
+
+
 results=scrape(destinations[0],destinations[1],depart_date,to_date);
 for item in results:
     print(item)

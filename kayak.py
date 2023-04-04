@@ -55,4 +55,4 @@ for z in range(len(list)):
 print(test_list)
 
 df=pd.DataFrame(test_list)
-df.to_excel("flightPrice.xlsx",index=None)
+df.to_excel("kayakPrices.xlsx",index=None)

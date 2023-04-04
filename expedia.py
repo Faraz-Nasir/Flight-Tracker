@@ -89,10 +89,15 @@ def scrape(fromLocation,toLocation,dept_date,ret_date):
             list.append(sub_sub_list)
     return list
 
+while True:
+    try:
+        destinations=getAirports();
+        break;
+    except:
+        print("Again")
 
-destinations=getAirports()
 print(destinations)
 list=scrape(destinations[0],destinations[1],'20-5-2023','25-5-2023')
 
 df=pd.DataFrame(list)
-df.to_excel("flightPrice1.xlsx",index=None)
+df.to_excel("expediaPrices.xlsx",index=None)
