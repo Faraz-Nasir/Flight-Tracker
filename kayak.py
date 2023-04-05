@@ -4,14 +4,22 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 
-import os
+import sys
 
+print("Kayak:- ",sys.argv[1])
+dept_date=sys.argv[1][2]
+ret_date=sys.argv[1][3]
+dept_date=dept_date[6:10]+dept_date[2:5]+"-"+dept_date[0:2]
+ret_date=ret_date[6:10]+ret_date[2:5]+"-"+ret_date[0:2]
+print(dept_date,ret_date)
 
 
 driver=webdriver.Chrome()
-from_location='DEL'
-to_location='MIA';
-url='https://www.kayak.com/flights/{from_location}-{to_location}/2023-04-30/2023-05-07'.format(from_location=from_location,to_location=to_location)
+from_location=sys.argv[2][0]
+to_location=sys.argv[2][1]
+
+print("kayak:- ",from_location,to_location)
+url='https://www.kayak.com/flights/{from_location}-{to_location}/{dept}/{ret}?sort=bestflight_a'.format(from_location=from_location,to_location=to_location,dept=dept_date,ret=ret_date)
 driver.get(url);
 sleep(5)
 
@@ -19,7 +27,7 @@ pop_window='//div[@class="dDYU-close dDYU-mod-variant-default dDYU-mod-size-defa
 try:
     print(driver.find_element(By.XPATH,pop_window))
 except:
-    print("")
+    print("KayakError(30)")
 
 flight_rows=driver.find_elements(By.XPATH,'//div[@class="nrc6-inner"]')
 list=[];
@@ -51,8 +59,10 @@ for z in range(len(list)):
 
         test_list.append(list[z][y])
     test_list.append([" "])
-    print("BREAK")
+    print("Kayak BREAK")
 print(test_list)
 
 df=pd.DataFrame(test_list)
 df.to_excel("kayakPrices.xlsx",index=None)
+
+print("Kayak Ended")

@@ -5,25 +5,26 @@ from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.keys import Keys
 
-
+import sys
+print("Yatra:- ",sys.argv[1])
 def getAirports():
     driver=webdriver.Chrome()
     url = "https://www.yatra.com/flights"
     driver.get(url);
     destinations=[];
     action = webdriver.ActionChains(driver)
-    sleep(5)
+    sleep(2)
     depart_from=driver.find_element(By.XPATH,"//input[@id='BE_flight_origin_city']")
     going_to=driver.find_element(By.XPATH,"//input[@id='BE_flight_arrival_city']")
     # print(depart_from,going_to)
     depart_from.click();
-    action.send_keys("Delhi");
+    action.send_keys(sys.argv[1][0]);
     action.perform()
     sleep(5)
     driver.find_element(By.XPATH, "//div[@class='ac_airport']").click()
-    sleep(10)
+    sleep(4)
 
-    action.send_keys("Bombay");
+    action.send_keys(sys.argv[1][1]);
     action.perform()
     sleep(5)
     driver.find_element(By.XPATH, "//div[@class='ac_airport']").click()
@@ -45,8 +46,20 @@ def scrape(destination,destination1,depart,to):
     driver.get(url);
     sleep(40)
 
-    flight_rows = driver.find_elements(By.XPATH, '//div[@class="flight-det table full-width clearfix "]')
+
     list = [];
+    list.append([url])
+    SCROLL_PAUSE_TIME = 4
+    last_height = driver.execute_script("return document.body.scrollHeight")
+    while True:
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        sleep(SCROLL_PAUSE_TIME)
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
+    sleep(5)
+    flight_rows = driver.find_elements(By.XPATH, '//div[@class="flight-det table full-width clearfix "]')
     for WebElement in flight_rows:
         elementHTML = WebElement.get_attribute('outerHTML');
         elementSoup = BeautifulSoup(elementHTML, 'html.parser');
@@ -63,20 +76,24 @@ def scrape(destination,destination1,depart,to):
                 sub_list.append('None')
             sub_list.append(rows.find("div", {"class": "i-b tipsy fare-summary-tooltip fs-16"}).getText())
             list.append(sub_list)
+
     for item in list:
-        print(item)
+        print("Yatra ",item)
+
     return list;
 
 
-depart_date='04-04-2023'.replace("-",'%2F');
-to_date='05-04-2023'.replace("-","%2F");
+depart_date=sys.argv[1][2].replace("-",'%2F');
+to_date=sys.argv[1][3].replace("-","%2F");
 
 while True:
     try:
         destinations=getAirports();
+        print(destinations,"-Yatra")
+        sys.argv.append(destinations)
         break;
     except:
-        print("Again")
+        print("Yatra Again(Error No:-85)")
 
 
 results=scrape(destinations[0],destinations[1],depart_date,to_date);
@@ -85,3 +102,5 @@ for item in results:
 
 df=pd.DataFrame(results)
 df.to_excel("yatraPrice.xlsx",index=None)
+
+print("Yatra Ended")
