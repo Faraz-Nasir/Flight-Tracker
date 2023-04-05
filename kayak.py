@@ -6,6 +6,13 @@ from bs4 import BeautifulSoup
 
 import sys
 
+while True:
+    if(len(sys.argv)==3):
+        print(sys.argv)
+        break;
+    else:
+        sleep(5)
+
 print("Kayak:- ",sys.argv[1])
 dept_date=sys.argv[1][2]
 ret_date=sys.argv[1][3]
@@ -66,3 +73,4 @@ df=pd.DataFrame(test_list)
 df.to_excel("kayakPrices.xlsx",index=None)
 
 print("Kayak Ended")
+
